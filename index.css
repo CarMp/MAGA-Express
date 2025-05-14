@@ -17,8 +17,8 @@ body, html {
 
 .login-container {
     width: 100%;
-    max-width: 100vw;
-    padding: 0 8px;
+    max-width: 80vw;
+    padding: 0 16px; /* Aumenta el padding lateral */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,13 +26,13 @@ body, html {
 
 .login-box {
     background: #fff;
-    padding: 28px 28px;
+    padding: 28px 12px;
     margin-top: 0;
     border-radius: 12px;
     box-shadow: 0 4px 24px rgba(0,0,0,0.08);
     min-width: 0;
     width: 100%;
-    max-width: 460px;
+    max-width: 95vw;
     box-sizing: border-box;
 }
 
@@ -100,14 +100,13 @@ button[type="submit"]:hover {
     background: #125ea8;
 }
 
-/* Desktop styles */
 @media (min-width: 600px) {
     .main-wrapper {
         min-height: 100vh;
         justify-content: center;
     }
     .login-container {
-        max-width: 550px;
+        max-width: 460px;
         padding: 0;
         display: flex;
         justify-content: center;
@@ -120,7 +119,7 @@ button[type="submit"]:hover {
         box-shadow: 0 4px 24px rgba(0,0,0,0.08);
         max-height: 600px;
         min-width: 320px;
-        max-width: 700px;
+        max-width: 460px;
     }
     .login-logo {
         min-height: 0;
