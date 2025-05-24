@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Pedido</title>
+    <link rel="stylesheet" href="pedidos.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Pedido</h1>
+        <form>
+            <label for="cliente">Nombre del cliente o negocio:</label>
+            <input type="text" id="cliente" name="cliente" placeholder="Ingresa el nombre" required>
+
+            <label for="producto">Producto pedido:</label>
+                <select id="producto" name="producto" required>
+                    <option value="">Selecciona un producto</option>
+                    <option value="product1">Carne de res</option>
+                    <option value="product2">Tomate</option>
+                    <option value="product3">Pepino</option>
+                </select>
+
+            <label for="cantidad">Cantidad del pedido:</label>
+                <select id="cantidad" name="cantidad" required>
+                    <option value="">Selecciona la cantidad</option>
+                    <option value="cantidad1">500g</option>
+                    <option value="cantidad2">1kg</option>
+                    <option value="cantidad3">5kg</option>
+                </select>
+
+            <label for="sucursal">Sucursal de entrega:</label>
+            <input type="text" id="sucursal" name="sucursal" placeholder="Ingresa sucursal de entrega" required>
+
+            <label for="fecha">Fecha de entrega:</label>
+            <input type="date" id="fecha" name="fecha" required>
+
+            <button type="submit">Registrar Pedido</button>
+        </form>
+    </div>
+</body>
+</html>
