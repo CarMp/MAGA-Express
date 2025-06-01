@@ -1,0 +1,110 @@
+body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        header {
+            background: #1976d2;
+            color: white;
+            padding: 0.5%;
+            text-align: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+/* Botón de editar */
+.editar-btn {
+    background-color: #4caf50; /* Verde */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+.editar-btn:hover {
+    background-color: #388e3c; /* Verde oscuro */
+}
+
+/* Botón de eliminar */
+.eliminar-btn {
+    background-color: #e53935; /* Rojo */
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+.eliminar-btn:hover {
+    background-color: #b71c1c; /* Rojo oscuro */
+}
+/* Botón de regresar */
+/* Botón de regresar con color amarillo */
+.back-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 10px 20px;
+    background-color: #ffc107; /* Amarillo contrastante */
+    color: #333; /* Texto oscuro para buena legibilidad */
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn:hover {
+    background-color: #e0a800; /* Amarillo más oscuro al pasar el cursor */
+}
+/* Ajustes en pantallas pequeñas */
+@media (max-width: 600px) {
+    .back-btn {
+        position: static; /* posición estática */
+        margin: 10px 10px 10px 10px; /* margen arriba y abajo, sin auto para centrar */
+        display: block; /* ocupa toda la línea */
+        text-align: left; /* si el botón tiene texto que quieres alinear */
+        /* o también puedes quitar el display block si no quieres que ocupe toda la línea */
+    }
+
+    header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Cambia a flex-start para alinear a la izquierda */
+    }
+
+    h1 {
+        margin-bottom: 10px;
+        text-align: center;
+        width: 100%; /* para que el h1 ocupe todo el ancho y quede centrado */
+    }
+}

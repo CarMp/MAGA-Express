@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Pedidos</title>
+    <link rel="stylesheet" href="verPedidos.css" />
+</head>
+<body>
+    <header>
+        <button class="back-btn" onclick="window.history.back()">Regresar</button>
+        <h1>Resumen de Pedidos</h1>
+    </header>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre del Cliente o Negocio</th>
+                    <th>Producto Pedido</th>
+                    <th>Cantidad del Pedido</th>
+                    <th>Sucursal de Entrega</th>
+                    <th>Fecha para Entregar</th>
+                    <th>Acciones</th> <!-- Nueva columna para los botones -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Ejemplo de datos con los botones -->
+                <tr>
+                    <td>Ejemplo Cliente</td>
+                    <td>Producto X</td>
+                    <td>10</td>
+                    <td>Sucursal Centro</td>
+                    <td>2025-06-15</td>
+                    <td>
+                        <button class="editar-btn">Editar</button>
+                        <button class="eliminar-btn">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ejemplo Negocio</td>
+                    <td>Producto Y</td>
+                    <td>5</td>
+                    <td>Sucursal Norte</td>
+                    <td>2025-06-20</td>
+                    <td>
+                        <button class="editar-btn">Editar</button>
+                        <button class="eliminar-btn">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

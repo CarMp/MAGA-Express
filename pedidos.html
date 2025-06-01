@@ -10,6 +10,8 @@
     <div class="main-wrapper">
       <div class="pedidos-container">
         <div class="pedidos-box">
+          <button onclick="window.location.href='verPedidos.html'" class="verPedidos-btn">Ver Pedidos</button>
+          <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
           <h1>Registro de Pedido</h1>
           <form id="pedidoForm">
             <div class="form-group">
@@ -59,9 +61,10 @@
               <input type="date" id="fecha" name="fecha" required />
             </div>
 
+            <!-- Botón para limpiar formulario -->
+            <button type="button" id="clearFormBtn">Limpiar Formulario</button>
             <button type="submit">Registrar Pedido</button>
           </form>
-          <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
         </div>
       </div>
     </div>
@@ -145,6 +148,11 @@
               submitBtn.textContent = "Registrar Pedido";
             });
         });
+
+      // Botón para limpiar formulario
+      document.getElementById("clearFormBtn").addEventListener("click", function () {
+        document.getElementById("pedidoForm").reset();
+      });
 
       // Botón de cerrar sesión en pedidos.html
       const logoutBtn = document.getElementById("logoutBtn");

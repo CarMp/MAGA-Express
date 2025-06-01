@@ -33,6 +33,7 @@ body, html {
     min-width: 0;
     width: 100%;
     max-width: 95vw;
+    position: relative; /* posiciona elementos dentro */
     box-sizing: border-box;
     overflow: visible; /* Asegura que el contenido no se corte */
     max-height: none; /* Permite que el box crezca según el contenido */
@@ -41,6 +42,7 @@ body, html {
 h1 {
     text-align: center;
     font-size: 1.8rem;
+    margin-top: 30px; /* Asegura un buen espaciado */
     margin-bottom: 18px;
     color: #222;
     font-weight: bolder;
@@ -77,22 +79,25 @@ button[type="submit"] {
     cursor: pointer;
     font-weight: 600;
     transition: background 0.2s;
+    margin-top: 40px;
 }
 button[type="submit"]:hover {
     background: #125ea8;
 }
 
 .logout-btn {
-    width: 100%;
-    padding: 18px;
+    width: auto;
+    padding: 10px 20px; /* Reduce el tamaño del botón */
     background: #e53935;
     color: #fff;
     border: none;
     border-radius: 6px;
-    font-size: 28px; /* Aumentado */
+    font-size: 16px; /* Aumentado */
     cursor: pointer;
     font-weight: 600;
-    margin-top: 18px;
+    position: absolute; /* Permite posicionamiento */
+    top: 20px; /* Ajusta la distancia desde la parte superior */
+    left: 20px; /* Ajusta la distancia desde la derecha */
     transition: background 0.2s;
     box-shadow: 0 2px 8px rgba(229,57,53,0.08);
 }
@@ -100,6 +105,47 @@ button[type="submit"]:hover {
     background: #b71c1c;
 }
 
+.verPedidos-btn {
+    width: auto;
+    padding: 10px 20px; /* Reduce el tamaño del botón */
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(67, 160, 71, 0.08);
+    position: absolute; /* Permite posicionamiento */
+    top: 20px; /* Ajusta la distancia desde la parte superior */
+    right: 20px; /* Ajusta la distancia desde la derecha */
+}
+.verPedidos-btn:hover {
+    background: #2e7d32;
+}
+@media (max-width: 600px) {
+    .verPedidos-btn {
+        margin-bottom: 20px; /* Corrige problema de espacio en celular */
+    }
+}
+button[type="button"] {
+    position: absolute; /* Posición relativa a su contenedor */
+    right: 30px; /* Separación del borde derecho */
+    bottom: 120px; /* Separación del botón "Registrar Pedido" */
+    padding: 10px 20px;
+    background: #ff9800; /* Color de fondo naranja */
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+button[type="button"]:hover {
+    background: #f57c00; /* Color más oscuro al pasar el cursor */
+}
 @media (min-width: 600px) {
     .main-wrapper {
         min-height: 100vh;
