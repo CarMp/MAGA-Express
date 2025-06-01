@@ -1,42 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registro de Pedido</title>
-    <link rel="stylesheet" href="pedidos.css">
-</head>
-<body>
-    <div class="container">
-        <h1>Registro de Pedido</h1>
-        <form>
-            <label for="cliente">Nombre del cliente o negocio:</label>
-            <input type="text" id="cliente" name="cliente" placeholder="Ingresa el nombre" required>
+    <link rel="stylesheet" href="pedidos.css" />
+  </head>
+  <body>
+    <div class="main-wrapper">
+      <div class="pedidos-container">
+        <div class="pedidos-box">
+          <h1>Registro de Pedido</h1>
+          <form id="pedidoForm">
+            <div class="form-group">
+              <label for="cliente">Nombre del cliente o negocio:</label>
+              <input
+                type="text"
+                id="cliente"
+                name="cliente"
+                placeholder="Ingresa el nombre"
+                required
+              />
+            </div>
 
-            <label for="producto">Producto pedido:</label>
-                <select id="producto" name="producto" required>
-                    <option value="">Selecciona un producto</option>
-                    <option value="product1">Carne de res</option>
-                    <option value="product2">Tomate</option>
-                    <option value="product3">Pepino</option>
-                </select>
+            <div class="form-group">
+              <label for="producto">Producto pedido:</label>
+              <select id="producto" name="producto" required>
+                <option value="">Selecciona un producto</option>
+                <option value="product1">Carne de res</option>
+                <option value="product2">Tomate</option>
+                <option value="product3">Pepino</option>
+              </select>
+            </div>
 
-            <label for="cantidad">Cantidad del pedido:</label>
-                <select id="cantidad" name="cantidad" required>
-                    <option value="">Selecciona la cantidad</option>
-                    <option value="cantidad1">500g</option>
-                    <option value="cantidad2">1kg</option>
-                    <option value="cantidad3">5kg</option>
-                </select>
+            <div class="form-group">
+              <label for="cantidad">Cantidad del pedido:</label>
+              <select id="cantidad" name="cantidad" required>
+                <option value="">Selecciona la cantidad</option>
+                <option value="cantidad1">500g</option>
+                <option value="cantidad2">1kg</option>
+                <option value="cantidad3">5kg</option>
+              </select>
+            </div>
 
-            <label for="sucursal">Sucursal de entrega:</label>
-            <input type="text" id="sucursal" name="sucursal" placeholder="Ingresa sucursal de entrega" required>
+            <div class="form-group">
+              <label for="sucursal">Sucursal de entrega:</label>
+              <input
+                type="text"
+                id="sucursal"
+                name="sucursal"
+                placeholder="Ingresa sucursal de entrega"
+                required
+              />
+            </div>
 
-            <label for="fecha">Fecha de entrega:</label>
-            <input type="date" id="fecha" name="fecha" required>
+            <div class="form-group">
+              <label for="fecha">Fecha de entrega:</label>
+              <input type="date" id="fecha" name="fecha" required />
+            </div>
 
             <button type="submit">Registrar Pedido</button>
-        </form>
+          </form>
+          <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+        </div>
+      </div>
     </div>
-</body>
+    <script>
+      // Obtener usuario y contraseña desde sessionStorage
+      const usuario = sessionStorage.getItem("usuario") || "";
+      const contrasenia = sessionStorage.getItem("contrasenia") || "";
+
+      // Si no hay usuario o contraseña, redirige al login
+      if (!usuario || !contrasenia) {
+        alert("Debes iniciar sesión para acceder a esta página.");
+        window.location.href = "index.html";
+      } else {
+        // Validar credenciales contra el endpoint antes de mostrar el formulario
+        const loginURL =
+          "https://script.google.com/macros/s/AKfycbzml1ZZh_78jjNbuhPsJZkVhuDBvdqx2ruTwf6v-cYpULMQNv2JqXlFqy2vmhH2TXo/exec";
+        const params = new URLSearchParams({ usuario, contrasenia });
+        fetch(`${loginURL}?${params.toString()}`, { method: "GET" })
+          .then((response) => response.text())
+          .then((result) => {
+            if (result !== "OK") {
+              alert(
+                "Usuario o contraseña incorrectos. Redirigiendo al inicio de sesión."
+              );
+              window.location.href = "index.html";
+            }
+          })
+          .catch(() => {
+            alert("Error al validar usuario. Intenta de nuevo más tarde.");
+            window.location.href = "index.html";
+          });
+      }
+
+      const scriptURL =
+        "https://script.google.com/macros/s/AKfycbzml1ZZh_78jjNbuhPsJZkVhuDBvdqx2ruTwf6v-cYpULMQNv2JqXlFqy2vmhH2TXo/exec";
+
+      document
+        .getElementById("pedidoForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const submitBtn = document.querySelector(
+            '#pedidoForm button[type="submit"]'
+          );
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Enviando...";
+          const data = {
+            usuario: usuario,
+            contrasenia: contrasenia,
+            cliente: document.getElementById("cliente").value,
+            producto: document.getElementById("producto").value,
+            cantidad: document.getElementById("cantidad").value,
+            sucursal: document.getElementById("sucursal").value,
+            fecha: document.getElementById("fecha").value,
+          };
+          fetch(scriptURL, {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: { "Content-Type": "application/json" },
+          })
+            .then((response) => response.text())
+            .then((result) => {
+              if (result === "OK") {
+                alert("Pedido registrado correctamente");
+                document.getElementById("pedidoForm").reset();
+              } else if (result === "Usuario o contraseña incorrectos") {
+                alert(
+                  "Usuario o contraseña incorrectos. No se registró el pedido."
+                );
+              } else if (result === "Correo inválido") {
+                alert("El correo ingresado no es válido.");
+              } else {
+                alert("Error: " + result);
+              }
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Registrar Pedido";
+            })
+            .catch((error) => {
+              alert("Error al registrar el pedido");
+              console.error(error);
+              submitBtn.disabled = false;
+              submitBtn.textContent = "Registrar Pedido";
+            });
+        });
+
+      // Botón de cerrar sesión en pedidos.html
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (sessionStorage.getItem("usuario")) {
+        logoutBtn.style.display = "block";
+        logoutBtn.addEventListener("click", function () {
+          sessionStorage.clear();
+          alert("Sesión cerrada.");
+          window.location.href = "index.html";
+        });
+      }
+    </script>
+  </body>
 </html>

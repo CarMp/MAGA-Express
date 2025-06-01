@@ -1,32 +1,96 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MAGA Express - Inicio Sesion</title>
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
     <div class="main-wrapper">
-        <div class="login-logo">
-            <img src="./Recursos/maga_logo.jpeg" alt="Logo MagaExpress" />
-        </div>
-        <div class="login-container">
-            <div class="login-box">
-                <form action="pedidos.html" method="get">
-                    <h2>Ingresa tus datos</h2>
-                    <div class="form-group">
-                        <label for="usuario">Usuario</label>
-                        <input type="text" id="usuario" name="usuario" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="contrasenia">Contraseña</label>
-                        <input type="password" id="contrasenia" name="contrasenia" required />
-                    </div>
-                    <button type="submit">Entrar</button>
-                </form>
+      <div class="login-logo">
+        <img src="./Recursos/maga_logo.jpeg" alt="Logo MagaExpress" />
+      </div>
+      <div class="login-container">
+        <div class="login-box">
+          <form id="loginForm">
+            <h2>Ingresa tus datos</h2>
+            <div class="form-group">
+              <label for="usuario">Correo electrónico</label>
+              <input
+                type="email"
+                id="usuario"
+                name="usuario"
+                required
+                pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                title="Ingresa un correo válido"
+              />
             </div>
+            <div class="form-group">
+              <label for="contrasenia">Contraseña</label>
+              <input
+                type="password"
+                id="contrasenia"
+                name="contrasenia"
+                required
+                minlength="6"
+              />
+            </div>
+            <button type="submit" id="loginBtn">Entrar</button>
+          </form>
         </div>
+      </div>
     </div>
-</body>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const btn = document.getElementById("loginBtn");
+          btn.disabled = true;
+          btn.textContent = "Validando...";
+          const email = document.getElementById("usuario").value;
+          const pass = document.getElementById("contrasenia").value;
+          const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+          if (!emailRegex.test(email)) {
+            alert("Ingresa un correo válido.");
+            btn.disabled = false;
+            btn.textContent = "Entrar";
+            return false;
+          }
+          if (pass.length < 6) {
+            alert("La contraseña debe tener al menos 6 caracteres.");
+            btn.disabled = false;
+            btn.textContent = "Entrar";
+            return false;
+          }
+          // Validar usuario y contraseña contra el endpoint antes de redirigir
+          const loginURL =
+            "https://script.google.com/macros/s/AKfycbzml1ZZh_78jjNbuhPsJZkVhuDBvdqx2ruTwf6v-cYpULMQNv2JqXlFqy2vmhH2TXo/exec";
+          const params = new URLSearchParams({
+            usuario: email,
+            contrasenia: pass,
+          });
+          fetch(`${loginURL}?${params.toString()}`, { method: "GET" })
+            .then((response) => response.text())
+            .then((result) => {
+              if (result === "OK") {
+                // Guarda usuario y contraseña en sessionStorage
+                sessionStorage.setItem("usuario", email);
+                sessionStorage.setItem("contrasenia", pass);
+                window.location.href = "pedidos.html";
+              } else {
+                alert("Usuario o contraseña incorrectos.");
+                btn.disabled = false;
+                btn.textContent = "Entrar";
+              }
+            })
+            .catch(() => {
+              alert("Error al validar usuario. Intenta de nuevo más tarde.");
+              btn.disabled = false;
+              btn.textContent = "Entrar";
+            });
+        });
+    </script>
+  </body>
 </html>
