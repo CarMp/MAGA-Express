@@ -10,7 +10,12 @@
     <div class="main-wrapper">
       <div class="pedidos-container">
         <div class="pedidos-box">
-          <button onclick="window.location.href='verPedidos.html'" class="verPedidos-btn">Ver Pedidos</button>
+          <button
+            onclick="window.location.href='verPedidos.html'"
+            class="verPedidos-btn"
+          >
+            Ver Pedidos
+          </button>
           <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
           <h1>Registro de Pedido</h1>
           <form id="pedidoForm">
@@ -29,9 +34,9 @@
               <label for="producto">Producto pedido:</label>
               <select id="producto" name="producto" required>
                 <option value="">Selecciona un producto</option>
-                <option value="product1">Carne de res</option>
-                <option value="product2">Tomate</option>
-                <option value="product3">Pepino</option>
+                <option value="Carne de res">Carne de res</option>
+                <option value="Tomate">Tomate</option>
+                <option value="Pepino">Pepino</option>
               </select>
             </div>
 
@@ -39,9 +44,9 @@
               <label for="cantidad">Cantidad del pedido:</label>
               <select id="cantidad" name="cantidad" required>
                 <option value="">Selecciona la cantidad</option>
-                <option value="cantidad1">500g</option>
-                <option value="cantidad2">1kg</option>
-                <option value="cantidad3">5kg</option>
+                <option value="500g">500g</option>
+                <option value="1kg">1kg</option>
+                <option value="5kg">5kg</option>
               </select>
             </div>
 
@@ -80,7 +85,7 @@
       } else {
         // Validar credenciales contra el endpoint antes de mostrar el formulario
         const loginURL =
-          "https://script.google.com/macros/s/AKfycbzml1ZZh_78jjNbuhPsJZkVhuDBvdqx2ruTwf6v-cYpULMQNv2JqXlFqy2vmhH2TXo/exec";
+          "https://script.google.com/macros/s/AKfycbxHgLSjRH51NdMy6NdNPAu2P-mraRo6-Hhwa5PjwndUySolMzoYH-sOTK1Q7v-fh3Of/exec";
         const params = new URLSearchParams({ usuario, contrasenia });
         fetch(`${loginURL}?${params.toString()}`, { method: "GET" })
           .then((response) => response.text())
@@ -99,7 +104,7 @@
       }
 
       const scriptURL =
-        "https://script.google.com/macros/s/AKfycbzml1ZZh_78jjNbuhPsJZkVhuDBvdqx2ruTwf6v-cYpULMQNv2JqXlFqy2vmhH2TXo/exec";
+        "https://script.google.com/macros/s/AKfycbxHgLSjRH51NdMy6NdNPAu2P-mraRo6-Hhwa5PjwndUySolMzoYH-sOTK1Q7v-fh3Of/exec";
 
       document
         .getElementById("pedidoForm")
@@ -110,19 +115,27 @@
           );
           submitBtn.disabled = true;
           submitBtn.textContent = "Enviando...";
-          const data = {
-            usuario: usuario,
-            contrasenia: contrasenia,
-            cliente: document.getElementById("cliente").value,
-            producto: document.getElementById("producto").value,
-            cantidad: document.getElementById("cantidad").value,
-            sucursal: document.getElementById("sucursal").value,
-            fecha: document.getElementById("fecha").value,
-          };
+          const formData = new URLSearchParams();
+          formData.append("usuario", usuario);
+          formData.append("contrasenia", contrasenia);
+          formData.append("cliente", document.getElementById("cliente").value);
+          formData.append(
+            "producto",
+            document.getElementById("producto").value
+          );
+          formData.append(
+            "cantidad",
+            document.getElementById("cantidad").value
+          );
+          formData.append(
+            "sucursal",
+            document.getElementById("sucursal").value
+          );
+          formData.append("fecha", document.getElementById("fecha").value);
+
           fetch(scriptURL, {
             method: "POST",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" },
+            body: formData,
           })
             .then((response) => response.text())
             .then((result) => {
@@ -150,9 +163,11 @@
         });
 
       // Botón para limpiar formulario
-      document.getElementById("clearFormBtn").addEventListener("click", function () {
-        document.getElementById("pedidoForm").reset();
-      });
+      document
+        .getElementById("clearFormBtn")
+        .addEventListener("click", function () {
+          document.getElementById("pedidoForm").reset();
+        });
 
       // Botón de cerrar sesión en pedidos.html
       const logoutBtn = document.getElementById("logoutBtn");
