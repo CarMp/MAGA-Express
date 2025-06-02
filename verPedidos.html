@@ -1,54 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resumen de Pedidos</title>
     <link rel="stylesheet" href="verPedidos.css" />
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <button class="back-btn" onclick="window.history.back()">Regresar</button>
-        <h1>Resumen de Pedidos</h1>
+      <button class="back-btn" onclick="window.history.back()">Regresar</button>
+      <h1>Resumen de Pedidos</h1>
     </header>
     <main>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre del Cliente o Negocio</th>
-                    <th>Producto Pedido</th>
-                    <th>Cantidad del Pedido</th>
-                    <th>Sucursal de Entrega</th>
-                    <th>Fecha para Entregar</th>
-                    <th>Acciones</th> <!-- Nueva columna para los botones -->
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Ejemplo de datos con los botones -->
-                <tr>
-                    <td>Ejemplo Cliente</td>
-                    <td>Producto X</td>
-                    <td>10</td>
-                    <td>Sucursal Centro</td>
-                    <td>2025-06-15</td>
-                    <td>
-                        <button class="editar-btn">Editar</button>
-                        <button class="eliminar-btn">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Ejemplo Negocio</td>
-                    <td>Producto Y</td>
-                    <td>5</td>
-                    <td>Sucursal Norte</td>
-                    <td>2025-06-20</td>
-                    <td>
-                        <button class="editar-btn">Editar</button>
-                        <button class="eliminar-btn">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+      <table id="pedidosTable">
+        <thead>
+          <tr>
+            <th>Nombre del Cliente o Negocio</th>
+            <th>Producto Pedido</th>
+            <th>Cantidad del Pedido</th>
+            <th>Sucursal de Entrega</th>
+            <th>Fecha para Entregar</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="pedidosBody">
+          <tr>
+            <td colspan="6" id="loadingRow">Cargando pedidos...</td>
+          </tr>
+        </tbody>
+      </table>
     </main>
-</body>
+    <!-- Modal para editar pedido -->
+    <div id="modalEditar" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" id="cerrarModal">&times;</span>
+        <h2>Editar Pedido</h2>
+        <form id="formEditar">
+          <input type="hidden" id="editId" />
+          <div class="form-group">
+            <label>Cliente:</label>
+            <input
+              type="text"
+              id="editCliente"
+              required
+              placeholder="Ingresa el nombre"
+            />
+          </div>
+          <div class="form-group">
+            <label>Producto:</label>
+            <select id="editProducto" required>
+              <option value="">Selecciona un producto</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Cantidad:</label>
+            <select id="editCantidad" required>
+              <option value="">Selecciona la cantidad</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Sucursal:</label>
+            <input
+              type="text"
+              id="editSucursal"
+              required
+              placeholder="Ingresa sucursal de entrega"
+            />
+          </div>
+          <div class="form-group">
+            <label>Fecha:</label>
+            <input type="date" id="editFecha" required />
+          </div>
+          <button type="submit">Guardar</button>
+          <button type="button" id="cancelarEditar">Cancelar</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      // --- SESIÓN Y VALIDACIÓN DE ACCESO ---
+      const usuario = sessionStorage.getItem("usuario") || "";
+      if (!usuario) {
+        alert("Debes iniciar sesión para ver los pedidos.");
+        window.location.href = "index.html";
+      }
+
+      // --- CONFIGURACIÓN DE ENDPOINTS Y CARGA INICIAL DE PEDIDOS ---
+      const pedidosURL =
+        "https://script.google.com/macros/s/AKfycbx7fSFykcfmftWyyVMo7k7NKxEllYS9dnX7HSnJGIv1GoJEqxLtA5gv-KZuP9Uvm_R6/exec";
+      const params = new URLSearchParams({
+        usuario,
+        accion: "listarPedidos",
+      });
+
+      // Cargar y mostrar la lista de pedidos
+      fetch(`${pedidosURL}?${params.toString()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const tbody = document.getElementById("pedidosBody");
+          tbody.innerHTML = "";
+          if (Array.isArray(data) && data.length > 0) {
+            data.forEach((pedido) => {
+              const tr = document.createElement("tr");
+              tr.setAttribute("data-id", pedido.id);
+              tr.innerHTML = `
+                        <td>${pedido.cliente || ""}</td>
+                        <td>${pedido.producto || ""}</td>
+                        <td>${pedido.cantidad || ""}</td>
+                        <td>${pedido.sucursal || ""}</td>
+                        <td>${pedido.fecha || ""}</td>
+                        <td>
+                            <button class='editar-btn'>Editar</button>
+                            <button class='eliminar-btn'>Eliminar</button>
+                        </td>
+                    `;
+              tbody.appendChild(tr);
+            });
+            // Asignar eventos a los botones de eliminar y editar
+            tbody.querySelectorAll(".eliminar-btn").forEach((btn) => {
+              btn.addEventListener("click", function () {
+                const tr = this.closest("tr");
+                const id = tr.getAttribute("data-id");
+                if (confirm("¿Seguro que deseas eliminar este pedido?")) {
+                  eliminarPedido(id);
+                }
+              });
+            });
+            tbody.querySelectorAll(".editar-btn").forEach((btn) => {
+              btn.addEventListener("click", function () {
+                const tr = this.closest("tr");
+                const id = tr.getAttribute("data-id");
+                abrirModalEditar(tr, id);
+              });
+            });
+          } else {
+            tbody.innerHTML =
+              '<tr><td colspan="6">No hay pedidos registrados.</td></tr>';
+          }
+        })
+        .catch((err) => {
+          const tbody = document.getElementById("pedidosBody");
+          tbody.innerHTML =
+            '<tr><td colspan="6">Error al cargar los pedidos.</td></tr>';
+        });
+
+      // --- CARGA DINÁMICA DE PRODUCTOS Y CANTIDADES EN EL MODAL DE EDICIÓN ---
+      const productosURL =
+        "https://script.google.com/macros/s/AKfycbx7fSFykcfmftWyyVMo7k7NKxEllYS9dnX7HSnJGIv1GoJEqxLtA5gv-KZuP9Uvm_R6/exec?accion=obtenerProductos&usuario=" +
+        encodeURIComponent(usuario);
+      let productosEditar = [];
+      let cantidadesPorProductoEditar = {};
+      function cargarProductosEditar(selectedProdId, selectedCantidad) {
+        fetch(productosURL).then(async (res) => {
+          const text = await res.text();
+          try {
+            const data = JSON.parse(text);
+            productosEditar = data;
+            const selectProducto = document.getElementById("editProducto");
+            selectProducto.innerHTML =
+              '<option value="">Selecciona un producto</option>';
+            cantidadesPorProductoEditar = {};
+            data.forEach((prod) => {
+              const option = document.createElement("option");
+              option.value = prod.id;
+              option.textContent = prod.nombre;
+              selectProducto.appendChild(option);
+              if (!cantidadesPorProductoEditar[prod.id]) {
+                cantidadesPorProductoEditar[prod.id] = [];
+              }
+              if (
+                !cantidadesPorProductoEditar[prod.id].includes(prod.cantidad)
+              ) {
+                cantidadesPorProductoEditar[prod.id].push(prod.cantidad);
+              }
+            });
+            if (selectedProdId) {
+              selectProducto.value = selectedProdId;
+              actualizarCantidadesEditar(selectedProdId, selectedCantidad);
+            } else {
+              actualizarCantidadesEditar();
+            }
+          } catch (err) {
+            alert("Error al cargar productos: " + text);
+          }
+        });
+      }
+      function actualizarCantidadesEditar(selectedProdId, selectedCantidad) {
+        const selectProducto = document.getElementById("editProducto");
+        const selectCantidad = document.getElementById("editCantidad");
+        const idProd = selectedProdId || selectProducto.value;
+        selectCantidad.innerHTML =
+          '<option value="">Selecciona la cantidad</option>';
+        if (cantidadesPorProductoEditar[idProd]) {
+          cantidadesPorProductoEditar[idProd].forEach((cant) => {
+            const option = document.createElement("option");
+            option.value = cant;
+            option.textContent = cant;
+            selectCantidad.appendChild(option);
+          });
+          if (selectedCantidad) {
+            selectCantidad.value = selectedCantidad;
+          }
+        }
+      }
+      document
+        .getElementById("editProducto")
+        .addEventListener("change", function () {
+          actualizarCantidadesEditar();
+        });
+
+      // --- ELIMINAR PEDIDO ---
+      function eliminarPedido(id) {
+        const formData = new URLSearchParams();
+        formData.append("usuario", usuario);
+        formData.append("accion", "eliminarPedido");
+        formData.append("id", id);
+        fetch(pedidosURL, {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.text())
+          .then((result) => {
+            if (result === "OK") {
+              alert("Pedido eliminado correctamente.");
+              location.reload();
+            } else {
+              alert("No se pudo eliminar el pedido.");
+            }
+          })
+          .catch(() => {
+            alert("Error al eliminar el pedido.");
+          });
+      }
+
+      // --- MODAL DE EDICIÓN DE PEDIDO ---
+      const modal = document.getElementById("modalEditar");
+      const cerrarModal = document.getElementById("cerrarModal");
+      const cancelarEditar = document.getElementById("cancelarEditar");
+      cerrarModal.onclick = cerrarModalFunc;
+      cancelarEditar.onclick = cerrarModalFunc;
+      function cerrarModalFunc() {
+        modal.style.display = "none";
+      }
+      window.onclick = function (event) {
+        if (event.target == modal) modal.style.display = "none";
+      };
+      function abrirModalEditar(tr, id) {
+        const tds = tr.querySelectorAll("td");
+        document.getElementById("editId").value = id;
+        document.getElementById("editCliente").value = tds[0].textContent;
+        // Cargar productos y cantidades dinámicamente y seleccionar los actuales
+        cargarProductosEditar(tds[1].textContent, tds[2].textContent);
+        document.getElementById("editSucursal").value = tds[3].textContent;
+        document.getElementById("editFecha").value = tds[4].textContent;
+        modal.style.display = "flex";
+      }
+      document.getElementById("formEditar").onsubmit = function (e) {
+        e.preventDefault();
+        const id = document.getElementById("editId").value;
+        const cliente = document.getElementById("editCliente").value;
+        const producto = document.getElementById("editProducto").value;
+        const cantidad = document.getElementById("editCantidad").value;
+        const sucursal = document.getElementById("editSucursal").value;
+        const fecha = document.getElementById("editFecha").value;
+        editarPedido(id, { cliente, producto, cantidad, sucursal, fecha });
+        modal.style.display = "none";
+      };
+
+      // --- EDICIÓN DE PEDIDO (prompt alternativo, no usado en modal) ---
+      function editarPedidoPrompt(tr, id) {
+        const tds = tr.querySelectorAll("td");
+        const cliente = prompt("Editar cliente:", tds[0].textContent);
+        if (cliente === null) return;
+        const producto = prompt("Editar producto:", tds[1].textContent);
+        if (producto === null) return;
+        const cantidad = prompt("Editar cantidad:", tds[2].textContent);
+        if (cantidad === null) return;
+        const sucursal = prompt("Editar sucursal:", tds[3].textContent);
+        if (sucursal === null) return;
+        const fecha = prompt("Editar fecha (YYYY-MM-DD):", tds[4].textContent);
+        if (fecha === null) return;
+        editarPedido(id, { cliente, producto, cantidad, sucursal, fecha });
+      }
+
+      // --- ENVÍO DE EDICIÓN DE PEDIDO AL BACKEND ---
+      function editarPedido(id, pedido) {
+        const formData = new URLSearchParams();
+        formData.append("usuario", usuario);
+        formData.append("accion", "editarPedido");
+        formData.append("id", id);
+        formData.append("cliente", pedido.cliente);
+        formData.append("producto", pedido.producto);
+        formData.append("cantidad", pedido.cantidad);
+        formData.append("sucursal", pedido.sucursal);
+        formData.append("fecha", pedido.fecha);
+        fetch(pedidosURL, {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.text())
+          .then((result) => {
+            if (result === "OK") {
+              alert("Pedido editado correctamente.");
+              location.reload();
+            } else {
+              alert("No se pudo editar el pedido.");
+            }
+          })
+          .catch(() => {
+            alert("Error al editar el pedido.");
+          });
+      }
+    </script>
+  </body>
 </html>

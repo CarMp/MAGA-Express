@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="pedidos.css" />
   </head>
   <body>
+    <!-- BLOQUE: Estructura principal y navegación -->
     <div class="main-wrapper">
       <div class="pedidos-container">
         <div class="pedidos-box">
@@ -18,6 +19,7 @@
           </button>
           <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
           <h1>Registro de Pedido</h1>
+          <!-- BLOQUE: Formulario de registro de pedido -->
           <form id="pedidoForm">
             <div class="form-group">
               <label for="cliente">Nombre del cliente o negocio:</label>
@@ -29,27 +31,18 @@
                 required
               />
             </div>
-
             <div class="form-group">
               <label for="producto">Producto pedido:</label>
               <select id="producto" name="producto" required>
                 <option value="">Selecciona un producto</option>
-                <option value="Carne de res">Carne de res</option>
-                <option value="Tomate">Tomate</option>
-                <option value="Pepino">Pepino</option>
               </select>
             </div>
-
             <div class="form-group">
               <label for="cantidad">Cantidad del pedido:</label>
               <select id="cantidad" name="cantidad" required>
                 <option value="">Selecciona la cantidad</option>
-                <option value="500g">500g</option>
-                <option value="1kg">1kg</option>
-                <option value="5kg">5kg</option>
               </select>
             </div>
-
             <div class="form-group">
               <label for="sucursal">Sucursal de entrega:</label>
               <input
@@ -60,12 +53,10 @@
                 required
               />
             </div>
-
             <div class="form-group">
               <label for="fecha">Fecha de entrega:</label>
               <input type="date" id="fecha" name="fecha" required />
             </div>
-
             <!-- Botón para limpiar formulario -->
             <button type="button" id="clearFormBtn">Limpiar Formulario</button>
             <button type="submit">Registrar Pedido</button>
@@ -74,37 +65,16 @@
       </div>
     </div>
     <script>
-      // Obtener usuario y contraseña desde sessionStorage
+      // BLOQUE: Validación de sesión de usuario
       const usuario = sessionStorage.getItem("usuario") || "";
-      const contrasenia = sessionStorage.getItem("contrasenia") || "";
-
-      // Si no hay usuario o contraseña, redirige al login
-      if (!usuario || !contrasenia) {
+      if (!usuario) {
         alert("Debes iniciar sesión para acceder a esta página.");
         window.location.href = "index.html";
-      } else {
-        // Validar credenciales contra el endpoint antes de mostrar el formulario
-        const loginURL =
-          "https://script.google.com/macros/s/AKfycbxHgLSjRH51NdMy6NdNPAu2P-mraRo6-Hhwa5PjwndUySolMzoYH-sOTK1Q7v-fh3Of/exec";
-        const params = new URLSearchParams({ usuario, contrasenia });
-        fetch(`${loginURL}?${params.toString()}`, { method: "GET" })
-          .then((response) => response.text())
-          .then((result) => {
-            if (result !== "OK") {
-              alert(
-                "Usuario o contraseña incorrectos. Redirigiendo al inicio de sesión."
-              );
-              window.location.href = "index.html";
-            }
-          })
-          .catch(() => {
-            alert("Error al validar usuario. Intenta de nuevo más tarde.");
-            window.location.href = "index.html";
-          });
       }
 
+      // BLOQUE: Envío del formulario de pedido al backend
       const scriptURL =
-        "https://script.google.com/macros/s/AKfycbxHgLSjRH51NdMy6NdNPAu2P-mraRo6-Hhwa5PjwndUySolMzoYH-sOTK1Q7v-fh3Of/exec";
+        "https://script.google.com/macros/s/AKfycbx7fSFykcfmftWyyVMo7k7NKxEllYS9dnX7HSnJGIv1GoJEqxLtA5gv-KZuP9Uvm_R6/exec";
 
       document
         .getElementById("pedidoForm")
@@ -117,7 +87,6 @@
           submitBtn.textContent = "Enviando...";
           const formData = new URLSearchParams();
           formData.append("usuario", usuario);
-          formData.append("contrasenia", contrasenia);
           formData.append("cliente", document.getElementById("cliente").value);
           formData.append(
             "producto",
@@ -162,14 +131,14 @@
             });
         });
 
-      // Botón para limpiar formulario
+      // BLOQUE: Botón para limpiar el formulario
       document
         .getElementById("clearFormBtn")
         .addEventListener("click", function () {
           document.getElementById("pedidoForm").reset();
         });
 
-      // Botón de cerrar sesión en pedidos.html
+      // BLOQUE: Cerrar sesión
       const logoutBtn = document.getElementById("logoutBtn");
       if (sessionStorage.getItem("usuario")) {
         logoutBtn.style.display = "block";
@@ -179,6 +148,67 @@
           window.location.href = "index.html";
         });
       }
+
+      // BLOQUE: Carga dinámica de productos y cantidades desde backend
+      const productosURL =
+        "https://script.google.com/macros/s/AKfycbx7fSFykcfmftWyyVMo7k7NKxEllYS9dnX7HSnJGIv1GoJEqxLtA5gv-KZuP9Uvm_R6/exec?" +
+        new URLSearchParams({
+          accion: "obtenerProductos",
+          usuario: usuario,
+        });
+      let productos = [];
+      let cantidadesPorProducto = {};
+      function cargarProductos() {
+        fetch(productosURL).then(async (res) => {
+          const text = await res.text();
+          try {
+            const data = JSON.parse(text);
+            productos = data;
+            const selectProducto = document.getElementById("producto");
+            selectProducto.innerHTML =
+              '<option value="">Selecciona un producto</option>';
+            cantidadesPorProducto = {};
+            data.forEach((prod) => {
+              // Llenar el select de productos con value=ID y texto=nombre
+              const option = document.createElement("option");
+              option.value = prod.id;
+              option.textContent = prod.nombre;
+              selectProducto.appendChild(option);
+              // Agrupar cantidades por producto (puede haber varios por producto)
+              if (!cantidadesPorProducto[prod.id]) {
+                cantidadesPorProducto[prod.id] = [];
+              }
+              if (!cantidadesPorProducto[prod.id].includes(prod.cantidad)) {
+                cantidadesPorProducto[prod.id].push(prod.cantidad);
+              }
+            });
+          } catch (err) {
+            alert("Error al cargar productos: " + text);
+          }
+        });
+      }
+      // BLOQUE: Actualización dinámica de cantidades según producto seleccionado
+      function actualizarCantidades() {
+        const selectProducto = document.getElementById("producto");
+        const selectCantidad = document.getElementById("cantidad");
+        const idProd = selectProducto.value;
+        selectCantidad.innerHTML =
+          '<option value="">Selecciona la cantidad</option>';
+        if (cantidadesPorProducto[idProd]) {
+          cantidadesPorProducto[idProd].forEach((cant) => {
+            const option = document.createElement("option");
+            option.value = cant;
+            option.textContent = cant;
+            selectCantidad.appendChild(option);
+          });
+        }
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        cargarProductos();
+        document
+          .getElementById("producto")
+          .addEventListener("change", actualizarCantidades);
+      });
     </script>
   </body>
 </html>
